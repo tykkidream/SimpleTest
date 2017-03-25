@@ -1,12 +1,12 @@
 package com.pzj.framework.armyant.load.fastjson;
 
 import com.alibaba.fastjson.JSONObject;
-import com.pzj.framework.armyant.load.LoadResource;
+import com.pzj.framework.armyant.load.Resource;
 
 /**
  * Created by Saber on 2017/3/18.
  */
-public class FastjsonResource implements LoadResource {
+public class FastjsonResource implements Resource {
 
     private Object sourceData;
 

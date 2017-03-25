@@ -1,9 +1,12 @@
 package com.pzj.framework.armyant;
 
 import com.pzj.framework.armyant.demo.User;
-import com.pzj.framework.armyant.load.fastjson.FastjsonLoader;
+import com.pzj.framework.armyant.load.Loader;
+import com.pzj.framework.armyant.load.fastjson.FastjsonLoaderBuild;
 import com.pzj.framework.armyant.load.fastjson.FastjsonResource;
-import com.pzj.framework.armyant.load.fastjson.parsers.VarietyParser;
+import com.pzj.framework.armyant.load.fastjson.parsers.BaseParser;
+import com.pzj.framework.armyant.load.fastjson.parsers.BeanParser;
+import com.pzj.framework.armyant.load.fastjson.parsers.MultiParser;
 import org.junit.Test;
 
 import java.text.ParseException;
@@ -17,13 +20,13 @@ import static org.junit.Assert.*;
 /**
  * Created by Saber on 2017/3/18.
  */
-public class FastjsonLoaderTest {
+public class FastjsonLoaderBuildTest {
     @Test
     public void data_01(){
-        FastjsonResource dataMap = new FastjsonResource("/data/data_01.json");
+        FastjsonResource resource = new FastjsonResource("/data/data_01.json");
 
-        FastjsonLoader loader = new FastjsonLoader();
-        loader.parser(dataMap);
+        BaseParser parser = new BaseParser();
+        Loader loader = FastjsonLoaderBuild.build(resource, parser);
 
         Integer data = (Integer)(loader.get());
 
@@ -35,67 +38,41 @@ public class FastjsonLoaderTest {
 
     @Test
     public void data_01_byget(){
-        FastjsonResource dataMap = new FastjsonResource("/data/data_01.json");
-
-        FastjsonLoader loader = new FastjsonLoader();
-        loader.parser(dataMap);
+        FastjsonResource resource = new FastjsonResource("/data/data_01.json");
 
         {
-            Integer data = loader.get(Integer.class);
+            BaseParser parser = new BaseParser(Integer.class);
+            Loader loader = FastjsonLoaderBuild.build(resource, parser);
+            Integer data = (Integer)loader.get();
             Integer expected = 123456789;
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
-            Long data = loader.get(Long.class);
+            BaseParser parser = new BaseParser(Long.class);
+            Loader loader = FastjsonLoaderBuild.build(resource, parser);
+            Long data = (Long)loader.get();
             Long expected = 123456789L;
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
-            String data = loader.get(String.class);
+            BaseParser parser = new BaseParser(String.class);
+            Loader loader = FastjsonLoaderBuild.build(resource, parser);
+            String data = (String)loader.get();
             String expected = "123456789";
             assertNotNull(data);
             assertEquals(expected, data);
         }
     }
 
-    @Test
-    public void data_01_string(){
-        FastjsonResource dataMap = new FastjsonResource("/data/data_01.json");
-
-        FastjsonLoader loader = new FastjsonLoader();
-        loader.parser(dataMap, String.class);
-
-        String data = (String) (loader.get());
-
-        String expected = "123456789";
-
-        assertNotNull(data);
-        assertEquals(expected, data);
-    }
-
-    @Test
-    public void data_01_long(){
-        FastjsonResource dataMap = new FastjsonResource("/data/data_01.json");
-
-        FastjsonLoader loader = new FastjsonLoader();
-        loader.parser(dataMap, Long.class);
-
-        Long data = (Long) (loader.get());
-
-        Long expected = 123456789L;
-
-        assertNotNull(data);
-        assertEquals(expected, data);
-    }
 
     @Test
     public void data_02(){
-        FastjsonResource dataMap = new FastjsonResource("/data/data_02.json");
+        FastjsonResource resource = new FastjsonResource("/data/data_02.json");
 
-        FastjsonLoader loader = new FastjsonLoader();
-        loader.parser(dataMap);
+        BaseParser parser = new BaseParser(String.class);
+        Loader loader = FastjsonLoaderBuild.build(resource, parser);
 
         String data = (String)(loader.get());
 
@@ -107,10 +84,10 @@ public class FastjsonLoaderTest {
 
     @Test
     public void data_03(){
-        FastjsonResource dataMap = new FastjsonResource("/data/data_03.json");
+        FastjsonResource resource = new FastjsonResource("/data/data_03.json");
 
-        FastjsonLoader loader = new FastjsonLoader();
-        loader.parser(dataMap);
+        BaseParser parser = new BaseParser(Integer.class);
+        Loader loader = FastjsonLoaderBuild.build(resource, parser);
 
         List<Integer> data = (List<Integer>)(loader.get());
 
@@ -128,10 +105,10 @@ public class FastjsonLoaderTest {
 
     @Test
     public void data_03_string(){
-        FastjsonResource dataMap = new FastjsonResource("/data/data_03.json");
+        FastjsonResource resource = new FastjsonResource("/data/data_03.json");
 
-        FastjsonLoader loader = new FastjsonLoader();
-        loader.parser(dataMap, String.class);
+        BaseParser parser = new BaseParser(String.class);
+        Loader loader = FastjsonLoaderBuild.build(resource, parser);
 
         List<String> data = (List<String>)(loader.get());
 
@@ -149,10 +126,10 @@ public class FastjsonLoaderTest {
 
     @Test
     public void data_03_long(){
-        FastjsonResource dataMap = new FastjsonResource("/data/data_03.json");
+        FastjsonResource resource = new FastjsonResource("/data/data_03.json");
 
-        FastjsonLoader loader = new FastjsonLoader();
-        loader.parser(dataMap, Long.class);
+        BaseParser parser = new BaseParser(Long.class);
+        Loader loader = FastjsonLoaderBuild.build(resource, parser);
 
         List<Long> data = (List<Long>)(loader.get());
 
@@ -170,10 +147,10 @@ public class FastjsonLoaderTest {
 
     @Test
     public void data_04(){
-        FastjsonResource dataMap = new FastjsonResource("/data/data_04.json");
+        FastjsonResource resource = new FastjsonResource("/data/data_04.json");
 
-        FastjsonLoader loader = new FastjsonLoader();
-        loader.parser(dataMap);
+        BaseParser parser = new BaseParser(String.class);
+        Loader loader = FastjsonLoaderBuild.build(resource, parser);
 
         List<String> data = (List<String>)(loader.get());
 
@@ -189,76 +166,80 @@ public class FastjsonLoaderTest {
         assertFalse(data.contains("hi"));
     }
 
-
     @Test
     public void data_05_getBy() throws ParseException {
-        FastjsonResource dataMap = new FastjsonResource("/data/data_05.json");
+        FastjsonResource resource = new FastjsonResource("/data/data_05.json");
 
-        FastjsonLoader loader = new FastjsonLoader();
-        loader.parser(dataMap);
+        MultiParser parser = new MultiParser();
 
         {
+            parser.registerParser("id", new BaseParser(Integer.class));
+            Loader loader = FastjsonLoaderBuild.build(resource, parser);
             Integer data = (Integer) loader.get("id");
             Integer expected = 1;
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
-            Long data = loader.get("id", Long.class);
+            parser.registerParser("id", new BaseParser(Long.class));
+            Loader loader = FastjsonLoaderBuild.build(resource, parser);
+            Long data = (Long)loader.get("id");
             Long expected = 1L;
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
-            String data = loader.get("id", String.class);
+            parser.registerParser("id", new BaseParser(String.class));
+            Loader loader = FastjsonLoaderBuild.build(resource, parser);
+            String data = (String)loader.get("id");
             String expected = "1";
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
+            parser.registerParser("nickname", new BaseParser(String.class));
+            Loader loader = FastjsonLoaderBuild.build(resource, parser);
             String data = (String)loader.get("nickname");
             String expected = "aabb";
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
-            String data = loader.get("nickname", String.class);
-            String expected = "aabb";
+            parser.registerParser("password", new BaseParser(Integer.class));
+            Loader loader = FastjsonLoaderBuild.build(resource, parser);
+            Integer data = (Integer) loader.get("password");
+            Integer expected = 123456;
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
-            String data = (String) loader.get("password");
+            parser.registerParser("password", new BaseParser(String.class));
+            Loader loader = FastjsonLoaderBuild.build(resource, parser);
+            String data = (String)loader.get("password");
             String expected = "123456";
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
-            String data = loader.get("password", String.class);
-            String expected = "123456";
+            parser.registerParser("sex", new BaseParser(Integer.class));
+            Loader loader = FastjsonLoaderBuild.build(resource, parser);
+            Integer data = (Integer) loader.get("sex");
+            Integer expected = 1;
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
+            parser.registerParser("sex", new BaseParser(String.class));
+            Loader loader = FastjsonLoaderBuild.build(resource, parser);
             String data = (String) loader.get("sex");
             String expected = "1";
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
-            Integer data = loader.get("sex", Integer.class);
-            Integer expected = 1;
-            assertNotNull(data);
-            assertEquals(expected, data);
-        }
-        {
-            String data = loader.get("birthDay", String.class);
-            String expected = "2016-10-21";
-            assertNotNull(data);
-            assertEquals(expected, data);
-        }
-        {
-            String data = (String) loader.get("birthDay");
+            parser.registerParser("birthDay", new BaseParser(String.class));
+            Loader loader = FastjsonLoaderBuild.build(resource, parser);
+            String data = (String)loader.get("birthDay");
             String expected = "2016-10-21";
             assertNotNull(data);
             assertEquals(expected, data);
@@ -271,17 +252,19 @@ public class FastjsonLoaderTest {
             assertEquals(expected, data);
         }*/
         {
-            String data = loader.get("aa", String.class);
+            parser.registerParser("aa", new BaseParser(String.class));
+            Loader loader = FastjsonLoaderBuild.build(resource, parser);
+            String data = (String)loader.get("aa");
             assertNull(data);
         }
     }
 
     @Test
     public void data_05() throws ParseException {
-        FastjsonResource dataMap = new FastjsonResource("/data/data_05.json");
+        FastjsonResource resource = new FastjsonResource("/data/data_05.json");
 
-        FastjsonLoader loader = new FastjsonLoader();
-        loader.parser(dataMap, User.class);
+        BeanParser parser = new BeanParser(User.class);
+        Loader loader = FastjsonLoaderBuild.build(resource, parser);
 
         User data = (User)loader.get();
 
@@ -307,10 +290,10 @@ public class FastjsonLoaderTest {
 
     @Test
     public void data_06() throws ParseException {
-        FastjsonResource dataMap = new FastjsonResource("/data/data_06.json");
+        FastjsonResource resource = new FastjsonResource("/data/data_06.json");
 
-        FastjsonLoader loader = new FastjsonLoader();
-        loader.parser(dataMap, User.class);
+        BeanParser parser = new BeanParser(User.class);
+        Loader loader = FastjsonLoaderBuild.build(resource, parser);
 
         List<User> data = (List<User>)loader.get();
 
@@ -340,63 +323,29 @@ public class FastjsonLoaderTest {
 
     @Test
     public void data_07() throws ParseException {
-        FastjsonResource dataMap = new FastjsonResource("/data/data_07.json");
+        FastjsonResource resource = new FastjsonResource("/data/data_07.json");
 
-        FastjsonLoader loader = new FastjsonLoader();
+        MultiParser parser = new MultiParser();
+        parser.registerParser("user", new BeanParser(User.class));
+        Loader loader = FastjsonLoaderBuild.build(resource, parser);
+        User data = (User)loader.get("user");
 
-        loader.parser(dataMap, User.class);
+        Long expectedId = 1L;
+        String expectedUsername = "tomcat";
+        String expectedNickname = "aabb";
+        String expectedPassword = "123456";
+        Integer expectedSex = 1;
 
-        {
-            User data = (User) loader.get();
-            assertNull(data.getId());
-        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date expectedBirthDay = sdf.parse("2016-10-21");
 
-        {
-            User data = loader.get("user", User.class);
-
-            Long expectedId = 1L;
-            String expectedUsername = "tomcat";
-            String expectedNickname = "aabb";
-            String expectedPassword = "123456";
-            Integer expectedSex = 1;
-
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Date expectedBirthDay = sdf.parse("2016-10-21");
-
-            assertNotNull(data);
-            assertEquals(expectedId, data.getId());
-            assertEquals(expectedUsername, data.getUsername());
-            assertEquals(expectedNickname, data.getNickname());
-            assertEquals(expectedPassword, data.getPassword());
-            assertEquals(expectedSex, data.getSex());
-            assertEquals(expectedBirthDay, data.getBirthDay());
-        }
-
-        {
-            VarietyParser parser = new VarietyParser();
-            parser.registerParser("user", User.class);
-            loader.parser(dataMap, parser);
-
-            User data = (User) loader.get("user");
-
-            Long expectedId = 1L;
-            String expectedUsername = "tomcat";
-            String expectedNickname = "aabb";
-            String expectedPassword = "123456";
-            Integer expectedSex = 1;
-
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Date expectedBirthDay = sdf.parse("2016-10-21");
-
-            assertNotNull(data);
-            assertEquals(expectedId, data.getId());
-            assertEquals(expectedUsername, data.getUsername());
-            assertEquals(expectedNickname, data.getNickname());
-            assertEquals(expectedPassword, data.getPassword());
-            assertEquals(expectedSex, data.getSex());
-            assertEquals(expectedBirthDay, data.getBirthDay());
-        }
+        assertNotNull(data);
+        assertEquals(expectedId, data.getId());
+        assertEquals(expectedUsername, data.getUsername());
+        assertEquals(expectedNickname, data.getNickname());
+        assertEquals(expectedPassword, data.getPassword());
+        assertEquals(expectedSex, data.getSex());
+        assertEquals(expectedBirthDay, data.getBirthDay());
 
     }
-
 }

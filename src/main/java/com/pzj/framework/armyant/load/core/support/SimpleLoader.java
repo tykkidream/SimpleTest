@@ -1,7 +1,7 @@
 package com.pzj.framework.armyant.load.core.support;
 
 import com.pzj.framework.armyant.load.core.LoadDataMap;
-import com.pzj.framework.armyant.load.LoadParser;
+import com.pzj.framework.armyant.load.Parser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.Map;
  * Created by Saber on 2017/3/18.
  */
 public class SimpleLoader {
-    private Map<String, LoadParser> loadDataParserMap;
+    private Map<String, Parser> loadDataParserMap;
 
     private LoadDataMap loadDataMap;
 
@@ -19,7 +19,7 @@ public class SimpleLoader {
         this.loadDataMap = loadDataMap;
     }
 
-    public <T extends LoadParser> void registerParser(String key, Class<T> parserClass){
+    public <T extends Parser> void registerParser(String key, Class<T> parserClass){
         try {
             T parser = parserClass.newInstance();
             registerParser(key, parser);
@@ -28,7 +28,7 @@ public class SimpleLoader {
         }
     }
 
-    public void registerParser(String key, LoadParser loadDataParser){
+    public void registerParser(String key, Parser loadDataParser){
         loadDataParserMap.put(key, loadDataParser);
     }
 

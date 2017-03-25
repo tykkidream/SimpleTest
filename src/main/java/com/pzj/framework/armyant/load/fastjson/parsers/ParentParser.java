@@ -3,8 +3,7 @@ package com.pzj.framework.armyant.load.fastjson.parsers;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.pzj.framework.armyant.load.LoadParser;
-import com.pzj.framework.armyant.load.LoadResource;
+import com.pzj.framework.armyant.load.Parser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,34 +13,32 @@ import java.util.Map;
 /**
  * Created by Saber on 2017/3/19.
  */
-public abstract class ParentParser implements LoadParser{
-
-    @Override
-    public Object parseTheActualObject(LoadResource resource) {
-        return autoParse(resource.getResource(), null);
+public abstract class ParentParser implements Parser {
+    public ParentParser(){
+        super();
     }
 
     @Override
-    public <T> T parseTheActualObject(LoadResource resource, Class<T> clazz) {
-        return (T)autoParse(resource.getResource(), clazz);
+    public Object parseTheActualObject(Object resource) {
+        return autoParse(resource, null);
     }
 
-    @Override
-    public Object parseTheActualObject(LoadResource resource, String key) {
-        return parseTheActualObject(resource, null, key);
+    public static  Object parseTheActualObject(Object resource, Class clazz) {
+        return autoParse(resource, clazz);
     }
 
-    @Override
-    public <T> T parseTheActualObject(LoadResource resource, Class<T> clazz, String key) {
-        Object resourceObject = resource.getResource();
-        if (resourceObject instanceof Map){
-            Map resourceMap = (Map)resourceObject;
+    public static Object parseTheActualObject(Object resource, String key) {
+        return parseTheActualObject(resource, key, null);
+    }
+
+    public static  Object parseTheActualObject(Object resource, String key, Class clazz) {
+        if (resource instanceof Map){
+            Map resourceMap = (Map)resource;
 
             Object value = resourceMap.get(key);
 
-            return (T)autoParse(value, clazz);
+            return autoParse(value, clazz);
         }
-
         return null;
     }
 
@@ -50,7 +47,7 @@ public abstract class ParentParser implements LoadParser{
      * @param sourceValue
      * @return
      */
-    public Object autoParse(Object sourceValue, Class clazz){
+    public static Object autoParse(Object sourceValue, Class clazz){
         if (sourceValue == null){
             return null;
         }
@@ -85,7 +82,7 @@ public abstract class ParentParser implements LoadParser{
         return actualObject;
     }
 
-    protected Object parseTheBasicObject(Object data, Class clazz){
+    public static Object parseTheBasicObject(Object data, Class clazz){
         Object convertObject = data;
 
         if (clazz == Integer.class){
