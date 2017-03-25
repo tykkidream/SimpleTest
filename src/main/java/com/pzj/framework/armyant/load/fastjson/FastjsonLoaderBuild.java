@@ -21,7 +21,7 @@ public class FastjsonLoaderBuild {
         if (loadResult instanceof Map){
             return new MapBasket(resource, (Map) loadResult);
         } else {
-            return new ObjectBasket<>(resource, loadResult);
+            return new ObjectBasket(resource, loadResult);
         }
     }
 }

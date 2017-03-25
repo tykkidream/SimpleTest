@@ -6,6 +6,7 @@ import com.pzj.framework.armyant.load.fastjson.FastjsonLoaderBuild;
 import com.pzj.framework.armyant.load.fastjson.FastjsonResource;
 import com.pzj.framework.armyant.load.fastjson.parsers.BaseParser;
 import com.pzj.framework.armyant.load.fastjson.parsers.BeanParser;
+import com.pzj.framework.armyant.load.fastjson.parsers.BasketParser;
 import com.pzj.framework.armyant.load.fastjson.parsers.MultiParser;
 import org.junit.Test;
 
@@ -340,6 +341,74 @@ public class FastjsonBasketBuildTest {
         Date expectedBirthDay = sdf.parse("2016-10-21");
 
         assertNotNull(data);
+        assertEquals(expectedId, data.getId());
+        assertEquals(expectedUsername, data.getUsername());
+        assertEquals(expectedNickname, data.getNickname());
+        assertEquals(expectedPassword, data.getPassword());
+        assertEquals(expectedSex, data.getSex());
+        assertEquals(expectedBirthDay, data.getBirthDay());
+
+    }
+
+    @Test
+    public void data_08() throws ParseException {
+        FastjsonResource resource = new FastjsonResource("/data/data_08.json");
+
+        MultiParser parser = new MultiParser();
+        parser.registerParser("user", new BeanParser(User.class));
+        Basket basket = FastjsonLoaderBuild.build(resource, parser);
+        List<User> datas = (List<User>)basket.get("user");
+
+        assertNotNull(datas);
+        User data = datas.get(0);
+
+        Long expectedId = 1L;
+        String expectedUsername = "tomcat";
+        String expectedNickname = "aabb";
+        String expectedPassword = "123456";
+        Integer expectedSex = 1;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date expectedBirthDay = sdf.parse("2016-10-21");
+
+        assertEquals(expectedId, data.getId());
+        assertEquals(expectedUsername, data.getUsername());
+        assertEquals(expectedNickname, data.getNickname());
+        assertEquals(expectedPassword, data.getPassword());
+        assertEquals(expectedSex, data.getSex());
+        assertEquals(expectedBirthDay, data.getBirthDay());
+    }
+
+
+    @Test
+    public void data_09() throws ParseException {
+        FastjsonResource resource = new FastjsonResource("/data/data_09.json");
+
+        BeanParser beanParser = new BeanParser(User.class);
+
+        BasketParser basketParser = new BasketParser();
+        basketParser.registerParser("user", beanParser);
+
+        MultiParser parser = new MultiParser();
+        parser.registerParser("case1", basketParser);
+        Basket basket = FastjsonLoaderBuild.build(resource, parser);
+        assertNotNull(basket);
+
+        Basket case1Basket = (Basket) basket.get("case1");
+        assertNotNull(case1Basket);
+
+        User data = (User) case1Basket.get("user");
+        assertNotNull(data);
+
+        Long expectedId = 1L;
+        String expectedUsername = "tomcat";
+        String expectedNickname = "aabb";
+        String expectedPassword = "123456";
+        Integer expectedSex = 1;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date expectedBirthDay = sdf.parse("2016-10-21");
+
         assertEquals(expectedId, data.getId());
         assertEquals(expectedUsername, data.getUsername());
         assertEquals(expectedNickname, data.getNickname());

@@ -54,7 +54,7 @@ public class SchemaParser extends ParentParser {
             return null;
         }
         if (Basket.class.isAssignableFrom(clazz)){
-            return new LoaderParser();
+            return new BasketParser();
         } else {
             return new BeanParser(clazz);
         }

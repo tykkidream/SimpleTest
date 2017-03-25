@@ -1,21 +1,21 @@
 package com.pzj.framework.armyant.load.fastjson.loaders;
 
-import com.pzj.framework.armyant.load.Resource;
-
 import java.util.Map;
 
 /**
  * Created by Saber on 2017/3/19.
  */
-public class MapBasket extends ObjectBasket<Map<String, Object>> {
+public class MapBasket extends ObjectBasket {
+    private Map<String, Object> targetData = null;
 
-    public MapBasket(Resource resource, Map<String, Object> targetData) {
+    public MapBasket(Object resource, Map<String, Object> targetData) {
         super(resource, targetData);
+        this.targetData = targetData;
     }
 
     @Override
     public Map<String, Object> get() {
-        return super.get();
+        return targetData;
     }
 
     @Override

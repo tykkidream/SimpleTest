@@ -6,22 +6,22 @@ import com.pzj.framework.armyant.load.Resource;
 /**
  * Created by Saber on 2017/3/19.
  */
-public class ObjectBasket<T> implements Basket {
-    protected final Resource resource;
+public class ObjectBasket implements Basket {
+    protected final Object resource;
 
-    protected final T targetData;
+    protected final Object targetData;
 
-    public ObjectBasket(Resource resource, T targetData){
+    public ObjectBasket(Object resource, Object targetData){
         this.resource = resource;
         this.targetData = targetData;
     }
 
-    public Resource getResource(){
+    public Object getResource(){
         return resource;
     }
 
     @Override
-    public T get() {
+    public Object get() {
         return targetData;
     }
 
