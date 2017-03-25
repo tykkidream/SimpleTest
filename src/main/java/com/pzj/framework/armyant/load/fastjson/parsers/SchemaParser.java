@@ -1,7 +1,7 @@
 package com.pzj.framework.armyant.load.fastjson.parsers;
 
 import com.pzj.framework.armyant.load.Parser;
-import com.pzj.framework.armyant.load.Loader;
+import com.pzj.framework.armyant.load.Basket;
 
 import java.util.Map;
 
@@ -53,7 +53,7 @@ public class SchemaParser extends ParentParser {
         if (clazz == null){
             return null;
         }
-        if (Loader.class.isAssignableFrom(clazz)){
+        if (Basket.class.isAssignableFrom(clazz)){
             return new LoaderParser();
         } else {
             return new BeanParser(clazz);

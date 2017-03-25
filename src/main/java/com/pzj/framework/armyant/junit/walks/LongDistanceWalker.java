@@ -4,7 +4,7 @@ import com.pzj.framework.armyant.OneTestConfiguration;
 import com.pzj.framework.armyant.OneTestConfigurationBuilder;
 import com.pzj.framework.armyant.junit.RunnerRun;
 import com.pzj.framework.armyant.junit.Walker;
-import com.pzj.framework.armyant.junit.annotaions.WalkerCase;
+import com.pzj.framework.armyant.junit.annotaions.DataFile;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.FrameworkMethod;
@@ -26,8 +26,8 @@ public class LongDistanceWalker extends Walker {
     }
 
     private void aa(){
-        WalkerCase walkerCase = frameworkMethod.getAnnotation(WalkerCase.class);
-        String filePath = walkerCase.value();
+        DataFile dataFile = frameworkMethod.getAnnotation(DataFile.class);
+        String filePath = dataFile.value();
 
         OneTestConfiguration oneTestConfiguration = OneTestConfigurationBuilder.build(filePath);
     }

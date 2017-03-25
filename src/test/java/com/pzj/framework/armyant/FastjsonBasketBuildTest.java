@@ -1,7 +1,7 @@
 package com.pzj.framework.armyant;
 
 import com.pzj.framework.armyant.demo.User;
-import com.pzj.framework.armyant.load.Loader;
+import com.pzj.framework.armyant.load.Basket;
 import com.pzj.framework.armyant.load.fastjson.FastjsonLoaderBuild;
 import com.pzj.framework.armyant.load.fastjson.FastjsonResource;
 import com.pzj.framework.armyant.load.fastjson.parsers.BaseParser;
@@ -20,15 +20,15 @@ import static org.junit.Assert.*;
 /**
  * Created by Saber on 2017/3/18.
  */
-public class FastjsonLoaderBuildTest {
+public class FastjsonBasketBuildTest {
     @Test
     public void data_01(){
         FastjsonResource resource = new FastjsonResource("/data/data_01.json");
 
         BaseParser parser = new BaseParser();
-        Loader loader = FastjsonLoaderBuild.build(resource, parser);
+        Basket basket = FastjsonLoaderBuild.build(resource, parser);
 
-        Integer data = (Integer)(loader.get());
+        Integer data = (Integer)(basket.get());
 
         Integer expected = 123456789;
 
@@ -42,24 +42,24 @@ public class FastjsonLoaderBuildTest {
 
         {
             BaseParser parser = new BaseParser(Integer.class);
-            Loader loader = FastjsonLoaderBuild.build(resource, parser);
-            Integer data = (Integer)loader.get();
+            Basket basket = FastjsonLoaderBuild.build(resource, parser);
+            Integer data = (Integer) basket.get();
             Integer expected = 123456789;
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
             BaseParser parser = new BaseParser(Long.class);
-            Loader loader = FastjsonLoaderBuild.build(resource, parser);
-            Long data = (Long)loader.get();
+            Basket basket = FastjsonLoaderBuild.build(resource, parser);
+            Long data = (Long) basket.get();
             Long expected = 123456789L;
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
             BaseParser parser = new BaseParser(String.class);
-            Loader loader = FastjsonLoaderBuild.build(resource, parser);
-            String data = (String)loader.get();
+            Basket basket = FastjsonLoaderBuild.build(resource, parser);
+            String data = (String) basket.get();
             String expected = "123456789";
             assertNotNull(data);
             assertEquals(expected, data);
@@ -72,9 +72,9 @@ public class FastjsonLoaderBuildTest {
         FastjsonResource resource = new FastjsonResource("/data/data_02.json");
 
         BaseParser parser = new BaseParser(String.class);
-        Loader loader = FastjsonLoaderBuild.build(resource, parser);
+        Basket basket = FastjsonLoaderBuild.build(resource, parser);
 
-        String data = (String)(loader.get());
+        String data = (String)(basket.get());
 
         String expected = "hello world";
 
@@ -87,9 +87,9 @@ public class FastjsonLoaderBuildTest {
         FastjsonResource resource = new FastjsonResource("/data/data_03.json");
 
         BaseParser parser = new BaseParser(Integer.class);
-        Loader loader = FastjsonLoaderBuild.build(resource, parser);
+        Basket basket = FastjsonLoaderBuild.build(resource, parser);
 
-        List<Integer> data = (List<Integer>)(loader.get());
+        List<Integer> data = (List<Integer>)(basket.get());
 
         Integer expected1 = 123456789;
         Integer expected2 = 223456789;
@@ -108,9 +108,9 @@ public class FastjsonLoaderBuildTest {
         FastjsonResource resource = new FastjsonResource("/data/data_03.json");
 
         BaseParser parser = new BaseParser(String.class);
-        Loader loader = FastjsonLoaderBuild.build(resource, parser);
+        Basket basket = FastjsonLoaderBuild.build(resource, parser);
 
-        List<String> data = (List<String>)(loader.get());
+        List<String> data = (List<String>)(basket.get());
 
         String expected1 = "123456789";
         String expected2 = "223456789";
@@ -129,9 +129,9 @@ public class FastjsonLoaderBuildTest {
         FastjsonResource resource = new FastjsonResource("/data/data_03.json");
 
         BaseParser parser = new BaseParser(Long.class);
-        Loader loader = FastjsonLoaderBuild.build(resource, parser);
+        Basket basket = FastjsonLoaderBuild.build(resource, parser);
 
-        List<Long> data = (List<Long>)(loader.get());
+        List<Long> data = (List<Long>)(basket.get());
 
         Long expected1 = 123456789L;
         Long expected2 = 223456789L;
@@ -150,9 +150,9 @@ public class FastjsonLoaderBuildTest {
         FastjsonResource resource = new FastjsonResource("/data/data_04.json");
 
         BaseParser parser = new BaseParser(String.class);
-        Loader loader = FastjsonLoaderBuild.build(resource, parser);
+        Basket basket = FastjsonLoaderBuild.build(resource, parser);
 
-        List<String> data = (List<String>)(loader.get());
+        List<String> data = (List<String>)(basket.get());
 
         String expected1 = "hello world";
         String expected2 = "hello tom";
@@ -174,72 +174,72 @@ public class FastjsonLoaderBuildTest {
 
         {
             parser.registerParser("id", new BaseParser(Integer.class));
-            Loader loader = FastjsonLoaderBuild.build(resource, parser);
-            Integer data = (Integer) loader.get("id");
+            Basket basket = FastjsonLoaderBuild.build(resource, parser);
+            Integer data = (Integer) basket.get("id");
             Integer expected = 1;
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
             parser.registerParser("id", new BaseParser(Long.class));
-            Loader loader = FastjsonLoaderBuild.build(resource, parser);
-            Long data = (Long)loader.get("id");
+            Basket basket = FastjsonLoaderBuild.build(resource, parser);
+            Long data = (Long) basket.get("id");
             Long expected = 1L;
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
             parser.registerParser("id", new BaseParser(String.class));
-            Loader loader = FastjsonLoaderBuild.build(resource, parser);
-            String data = (String)loader.get("id");
+            Basket basket = FastjsonLoaderBuild.build(resource, parser);
+            String data = (String) basket.get("id");
             String expected = "1";
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
             parser.registerParser("nickname", new BaseParser(String.class));
-            Loader loader = FastjsonLoaderBuild.build(resource, parser);
-            String data = (String)loader.get("nickname");
+            Basket basket = FastjsonLoaderBuild.build(resource, parser);
+            String data = (String) basket.get("nickname");
             String expected = "aabb";
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
             parser.registerParser("password", new BaseParser(Integer.class));
-            Loader loader = FastjsonLoaderBuild.build(resource, parser);
-            Integer data = (Integer) loader.get("password");
+            Basket basket = FastjsonLoaderBuild.build(resource, parser);
+            Integer data = (Integer) basket.get("password");
             Integer expected = 123456;
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
             parser.registerParser("password", new BaseParser(String.class));
-            Loader loader = FastjsonLoaderBuild.build(resource, parser);
-            String data = (String)loader.get("password");
+            Basket basket = FastjsonLoaderBuild.build(resource, parser);
+            String data = (String) basket.get("password");
             String expected = "123456";
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
             parser.registerParser("sex", new BaseParser(Integer.class));
-            Loader loader = FastjsonLoaderBuild.build(resource, parser);
-            Integer data = (Integer) loader.get("sex");
+            Basket basket = FastjsonLoaderBuild.build(resource, parser);
+            Integer data = (Integer) basket.get("sex");
             Integer expected = 1;
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
             parser.registerParser("sex", new BaseParser(String.class));
-            Loader loader = FastjsonLoaderBuild.build(resource, parser);
-            String data = (String) loader.get("sex");
+            Basket basket = FastjsonLoaderBuild.build(resource, parser);
+            String data = (String) basket.get("sex");
             String expected = "1";
             assertNotNull(data);
             assertEquals(expected, data);
         }
         {
             parser.registerParser("birthDay", new BaseParser(String.class));
-            Loader loader = FastjsonLoaderBuild.build(resource, parser);
-            String data = (String)loader.get("birthDay");
+            Basket basket = FastjsonLoaderBuild.build(resource, parser);
+            String data = (String) basket.get("birthDay");
             String expected = "2016-10-21";
             assertNotNull(data);
             assertEquals(expected, data);
@@ -253,8 +253,8 @@ public class FastjsonLoaderBuildTest {
         }*/
         {
             parser.registerParser("aa", new BaseParser(String.class));
-            Loader loader = FastjsonLoaderBuild.build(resource, parser);
-            String data = (String)loader.get("aa");
+            Basket basket = FastjsonLoaderBuild.build(resource, parser);
+            String data = (String) basket.get("aa");
             assertNull(data);
         }
     }
@@ -264,9 +264,9 @@ public class FastjsonLoaderBuildTest {
         FastjsonResource resource = new FastjsonResource("/data/data_05.json");
 
         BeanParser parser = new BeanParser(User.class);
-        Loader loader = FastjsonLoaderBuild.build(resource, parser);
+        Basket basket = FastjsonLoaderBuild.build(resource, parser);
 
-        User data = (User)loader.get();
+        User data = (User) basket.get();
 
         Long expectedId = 1L;
         String expectedUsername = "tomcat";
@@ -293,9 +293,9 @@ public class FastjsonLoaderBuildTest {
         FastjsonResource resource = new FastjsonResource("/data/data_06.json");
 
         BeanParser parser = new BeanParser(User.class);
-        Loader loader = FastjsonLoaderBuild.build(resource, parser);
+        Basket basket = FastjsonLoaderBuild.build(resource, parser);
 
-        List<User> data = (List<User>)loader.get();
+        List<User> data = (List<User>) basket.get();
 
         assertNotNull(data);
         assertTrue(data.size() == 1);
@@ -327,8 +327,8 @@ public class FastjsonLoaderBuildTest {
 
         MultiParser parser = new MultiParser();
         parser.registerParser("user", new BeanParser(User.class));
-        Loader loader = FastjsonLoaderBuild.build(resource, parser);
-        User data = (User)loader.get("user");
+        Basket basket = FastjsonLoaderBuild.build(resource, parser);
+        User data = (User) basket.get("user");
 
         Long expectedId = 1L;
         String expectedUsername = "tomcat";

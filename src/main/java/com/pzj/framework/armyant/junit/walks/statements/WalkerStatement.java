@@ -1,7 +1,7 @@
 package com.pzj.framework.armyant.junit.walks.statements;
 
 import com.pzj.framework.armyant.OneTestConfiguration;
-import com.pzj.framework.armyant.junit.annotaions.Param;
+import com.pzj.framework.armyant.junit.annotaions.DataKey;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
@@ -38,8 +38,8 @@ public class WalkerStatement extends Statement {
             Annotation[] annos = parameterAnnotations[i];
             B : for (int j = 0; j < annos.length; j++){
                 Annotation anno = annos[j];
-                if (anno instanceof Param){
-                    Param testData = (Param) anno;
+                if (anno instanceof DataKey){
+                    DataKey testData = (DataKey) anno;
                     String dataKey = testData.value();
                     if ("".equals(dataKey)){
                         Object data = oneTestConfiguration.getTestData();

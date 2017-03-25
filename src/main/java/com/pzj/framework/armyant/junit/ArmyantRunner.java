@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.pzj.framework.armyant.junit.annotaions.WalkerCase;
+import com.pzj.framework.armyant.junit.annotaions.DataFile;
 import com.pzj.framework.armyant.junit.walks.FrameworkMethodWalker;
 import com.pzj.framework.armyant.junit.walks.LongDistanceWalker;
 import org.junit.Test;
@@ -30,7 +30,7 @@ public class ArmyantRunner extends ParentRunner<Walker> implements RunnerRun {
 
     private List<Walker> createWalker(){
         List<FrameworkMethod> testMethods = getTestClass().getAnnotatedMethods(Test.class);
-        List<FrameworkMethod> testWalkers = getTestClass().getAnnotatedMethods(WalkerCase.class);
+        List<FrameworkMethod> testWalkers = getTestClass().getAnnotatedMethods(DataFile.class);
 
         List<Walker> walkers = new ArrayList<>(testMethods.size());
         for (FrameworkMethod method : testMethods){
