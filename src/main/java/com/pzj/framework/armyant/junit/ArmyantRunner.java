@@ -29,11 +29,10 @@ import static org.junit.internal.runners.rules.RuleMemberValidator.RULE_VALIDATO
 public class ArmyantRunner extends ParentRunner<RunnerTask> {
     private static Logger logger = LoggerFactory.getLogger(ArmyantRunner.class);
 
-    private final List<RunnerTask> runnerTasks;
+    private List<RunnerTask> runnerTasks;
 
     public ArmyantRunner(Class<?> clazz) throws Throwable {
         super(clazz);
-        runnerTasks = Collections.unmodifiableList(createWalker());
     }
 
     private List<RunnerTask> createWalker() {
@@ -56,7 +55,7 @@ public class ArmyantRunner extends ParentRunner<RunnerTask> {
     private void addBatchRunnerTask(List<RunnerTask> runnerTasks, FrameworkMethod method) {
         List<Basket> baskets = baskets(method);
 
-        if (baskets.isEmpty()) {
+        if (baskets == null || baskets.isEmpty()) {
             return;
         }
 
@@ -79,6 +78,9 @@ public class ArmyantRunner extends ParentRunner<RunnerTask> {
 
     @Override
     protected List<RunnerTask> getChildren() {
+        if (runnerTasks == null){
+            runnerTasks = Collections.unmodifiableList(createWalker());
+        }
         return runnerTasks;
     }
 

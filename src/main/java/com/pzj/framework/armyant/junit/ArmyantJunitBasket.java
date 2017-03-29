@@ -28,6 +28,10 @@ public class ArmyantJunitBasket implements Basket{
 
         Basket basket = FastjsonLoaderBuild.build(resource, parser);
 
+        if (basket == null){
+            return null;
+        }
+
         ArmyantJunitBasket ajbasket = new ArmyantJunitBasket();
         ajbasket.basket = basket;
         return ajbasket;
