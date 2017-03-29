@@ -1,4 +1,4 @@
-package com.pzj.framework.armyant.junit.annotaions;
+package com.pzj.framework.armyant.junit;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,10 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by Administrator on 2017-1-4.
+ * Created by Saber on 2017/3/18.
  */
-@Target({ ElementType.PARAMETER })
+@Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DataKey {
-    String value() default "";
+public @interface DataFile {
+    String value();
 }
