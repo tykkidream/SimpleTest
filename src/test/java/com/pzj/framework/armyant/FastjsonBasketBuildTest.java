@@ -1,13 +1,11 @@
 package com.pzj.framework.armyant;
 
+import com.pzj.framework.armyant.demo.Car;
 import com.pzj.framework.armyant.demo.User;
 import com.pzj.framework.armyant.load.Basket;
 import com.pzj.framework.armyant.load.fastjson.FastjsonLoaderBuild;
 import com.pzj.framework.armyant.load.fastjson.FastjsonResource;
-import com.pzj.framework.armyant.load.fastjson.parsers.BaseParser;
-import com.pzj.framework.armyant.load.fastjson.parsers.BeanParser;
-import com.pzj.framework.armyant.load.fastjson.parsers.BasketParser;
-import com.pzj.framework.armyant.load.fastjson.parsers.MultiParser;
+import com.pzj.framework.armyant.load.fastjson.parsers.*;
 import org.junit.Test;
 
 import java.text.ParseException;
@@ -415,6 +413,27 @@ public class FastjsonBasketBuildTest {
         assertEquals(expectedPassword, data.getPassword());
         assertEquals(expectedSex, data.getSex());
         assertEquals(expectedBirthDay, data.getBirthDay());
+
+    }
+
+
+    @Test
+    public void data_19() throws ParseException {
+        FastjsonResource resource = new FastjsonResource("/data/data_10.json");
+
+        SchemaParser parser = new SchemaParser();
+        parser.registerParserSchema("data", "dataClass");
+        parser.registerParserSchema("case", "caseClass");
+
+        Basket basket = FastjsonLoaderBuild.build(resource, parser);
+
+        assertNotNull(basket);
+
+        Object d = basket.get("data");
+        assertTrue(d instanceof User);
+
+        Object c = basket.get("case");
+        assertTrue(c instanceof Car);
 
     }
 }

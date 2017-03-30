@@ -1,11 +1,20 @@
 {
   "data" : {
     "id": 1,
-    "username": "tomcat",
-    "nickname": "aabb",
-    "password": "123456",
-    "sex": "1",
-    "birthDay": "2016-10-21"
+    "username" : "tomcat",
+    "nickname" : "aabb",
+    "password" : "123456",
+    "sex": "1" ,
+    "birthDay" : "2016-10-21"
   },
-  "dataClass" :""
+  "dataClass" : "com.pzj.framework.armyant.demo.User",
+  "case" : {
+    "id": 1,
+    "name" : "tomcat",
+    "logo" : "圆",
+    "brand" : "宝马",
+    "marketDate" : "2016-10-21",
+    "Double": 510000
+  },
+  "caseClass" : "com.pzj.framework.armyant.demo.Car"
 }

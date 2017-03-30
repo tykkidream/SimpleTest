@@ -10,10 +10,15 @@ import java.util.Map;
  * Created by Saber on 2017/3/19.
  */
 public class MultiParser extends ParentParser implements Parser {
+
     private Map<String, Parser> parserMap = new HashMap<>();
 
     public MultiParser() {
         super();
+    }
+
+    public Map<String, Parser> getParserMap() {
+        return parserMap;
     }
 
     public void registerParser(String key, Parser parser){
@@ -34,7 +39,7 @@ public class MultiParser extends ParentParser implements Parser {
         return null;
     }
 
-    private Map<String, Object> doParse(Map resourceMap, Map<String, Parser> parserMap){
+    protected Map<String, Object> doParse(Map resourceMap, Map<String, Parser> parserMap){
         Map<String, Object> parserResult = new HashMap<>(resourceMap);
 
         Iterator<Map.Entry<String, Parser>> iterator = parserMap.entrySet().iterator();

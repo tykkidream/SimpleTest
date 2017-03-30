@@ -17,7 +17,7 @@ public class ArmyantJunitBasket implements Basket{
 
         FastjsonResource resource = new FastjsonResource(resourceClassPaht);
 
-        SchemaParser schemaParser = new SchemaParser("dataClass");
+        SchemaParser schemaParser = new SchemaParser();
 
         BasketParser basketParser = new BasketParser();
         basketParser.registerParser("data", schemaParser);
