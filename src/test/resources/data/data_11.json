@@ -1,0 +1,46 @@
+{
+  "data" : {
+    "user1" : {
+      "id": 1,
+      "username" : "tomcat",
+      "nickname" : "aabb",
+      "password" : "123456",
+      "sex": "1" ,
+      "birthDay" : "2016-10-21"
+    },
+    "user2" : {
+      "id": 1,
+      "username" : "tomcat",
+      "nickname" : "aabb",
+      "password" : "123456",
+      "sex": "1" ,
+      "birthDay" : "2016-10-21"
+    }
+  },
+  "dataClass" : {
+    "user1" : "com.pzj.framework.armyant.demo.User",
+    "user2" : "com.pzj.framework.armyant.demo.User"
+  },
+  "case" : {
+    "user" : {
+      "id": 1,
+      "username" : "tomcat",
+      "nickname" : "aabb",
+      "password" : "123456",
+      "sex": "1" ,
+      "birthDay" : "2016-10-21"
+    },
+    "car" : {
+      "id": 1,
+      "name" : "tomcat",
+      "logo" : "圆",
+      "brand" : "宝马",
+      "marketDate" : "2016-10-21",
+      "Double": 510000
+    }
+  },
+  "caseClass" : {
+    "user" : "com.pzj.framework.armyant.demo.User",
+    "car" : "com.pzj.framework.armyant.demo.Car"
+  }
+}

@@ -13,8 +13,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by Saber on 2017/3/18.
@@ -416,9 +418,8 @@ public class FastjsonBasketBuildTest {
 
     }
 
-
     @Test
-    public void data_19() throws ParseException {
+    public void data_10() throws ParseException {
         FastjsonResource resource = new FastjsonResource("/data/data_10.json");
 
         SchemaParser parser = new SchemaParser();
@@ -436,4 +437,73 @@ public class FastjsonBasketBuildTest {
         assertTrue(c instanceof Car);
 
     }
+
+    @Test
+    public void data_11() throws ParseException {
+        FastjsonResource resource = new FastjsonResource("/data/data_11.json");
+
+        SchemaParser parser = new SchemaParser();
+        parser.registerParserSchema("data", "dataClass");
+        parser.registerParserSchema("case", "caseClass");
+
+        Basket basket = FastjsonLoaderBuild.build(resource, parser);
+
+        assertNotNull(basket);
+
+        Object d = basket.get("data");
+        assertTrue(d instanceof Map);
+
+        Map dmap = (Map) d;
+
+        Object d1 = dmap.get("user1");
+        assertTrue(d1 instanceof User);
+        Object d2 = dmap.get("user2");
+        assertTrue(d2 instanceof User);
+
+
+        Object c = basket.get("case");
+        assertTrue(c instanceof Map);
+
+        Map cmap = (Map) c;
+
+        Object d3 = cmap.get("user");
+        assertTrue(d3 instanceof User);
+        Object d4 = cmap.get("car");
+        assertTrue(d4 instanceof Car);
+
+    }
+
+
+    @Test
+    public void data_12() throws ParseException {
+        FastjsonResource resource = new FastjsonResource("/data/data_12.json");
+
+        SchemaParser parser = new SchemaParser();
+        parser.registerParserSchema("data", "dataClass");
+
+        Basket basket = FastjsonLoaderBuild.build(resource, parser);
+        assertNotNull(basket);
+
+        Object data = basket.get("data");
+        assertNotNull(basket);
+        assertTrue(data instanceof List);
+
+        List dataList = (List)data;
+        assertTrue(dataList.size() > 0);
+
+        Object d1 = dataList.get(0);
+        assertNotNull(d1);
+        assertTrue(d1 instanceof Basket);
+
+        Basket dataBasket = (Basket)d1;
+
+        Object userObject = dataBasket.get("user");
+        assertNotNull(userObject);
+        assertTrue(userObject instanceof User);
+
+        Object carObject = dataBasket.get("car");
+        assertNotNull(carObject);
+        assertTrue(carObject instanceof Car);
+    }
+
 }

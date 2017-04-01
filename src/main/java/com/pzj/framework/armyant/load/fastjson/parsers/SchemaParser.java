@@ -5,6 +5,7 @@ import com.pzj.framework.armyant.load.Parser;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,38 +46,55 @@ public class SchemaParser extends MultiParser {
 
             Object schemaObject = resourceMap.get(dataSchema);
 
-            Parser schemaParser = schemaParser(schemaObject);
+            Object dataObject = resourceMap.get(dataKey);
+
+            Parser schemaParser = schemaParser(dataObject, schemaObject);
 
             parser.registerParser(dataKey, schemaParser);
         }
     }
 
-    private Parser schemaParser(Object schemaObject){
+    private Parser schemaParser(Object dataObject, Object schemaObject){
         if (schemaObject == null){
             return null;
         }
 
-        Parser schemaParser ;
-
         if (schemaObject instanceof Map){
-            schemaParser = loadParserOfMap((Map) schemaObject);
-        } else if (schemaObject instanceof String){
-            schemaParser = loadParserOfString((String) schemaObject);
-        } else {
-            throw new RuntimeException();
+            if (dataObject instanceof Map) {
+                return loadParserOfMap(dataObject, (Map) schemaObject);
+            }
+            if (dataObject instanceof List){
+                return loadParserOfList(dataObject, (Map) schemaObject);
+            }
         }
-        return schemaParser;
+        if (schemaObject instanceof String){
+            return loadParserOfString((String) schemaObject);
+        }
+        throw new RuntimeException();
     }
-    private Parser loadParserOfMap(Map schemaMap){
+
+    private Parser loadParserOfMap(Object dataObject, Map schemaMap){
         MultiParser multiParser = new MultiParser();
         Iterator<Map.Entry<String, Object>> iterator = schemaMap.entrySet().iterator();
         while (iterator.hasNext()){
             Map.Entry<String, Object> next = iterator.next();
 
-            Parser parser = schemaParser(next.getValue());
+            Parser parser = schemaParser(dataObject, next.getValue());
             multiParser.registerParser(next.getKey(), parser);
         }
         return multiParser;
+    }
+
+    private Parser loadParserOfList(Object dataObject, Map schemaObject) {
+        BasketParser basketParser = new BasketParser();
+        Iterator<Map.Entry<String, Object>> iterator = schemaObject.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<String, Object> next = iterator.next();
+
+            Parser parser = schemaParser(dataObject, next.getValue());
+            basketParser.registerParser(next.getKey(), parser);
+        }
+        return basketParser;
     }
 
     private Parser loadParserOfString(String schemaString){
