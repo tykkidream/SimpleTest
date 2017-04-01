@@ -15,6 +15,7 @@ import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -170,6 +171,17 @@ public class ArmyantRunner extends ParentRunner<RunnerTask> {
 
     protected void validateTestMethods(List<Throwable> errors) {
         validatePublicVoidNoArgMethods(Test.class, false, errors);
+    }
+
+    protected void validatePublicVoidNoArgMethods(Class<? extends Annotation> annotation,
+                                                  boolean isStatic, List<Throwable> errors) {
+        List<FrameworkMethod> methods = getTestClass().getAnnotatedMethods(annotation);
+
+        // 迭代每个方法
+        for (FrameworkMethod eachTestMethod : methods) {
+            // 检验方法是公共的、无返回值的
+            eachTestMethod.validatePublicVoid(isStatic, errors);
+        }
     }
 
     protected Object createTest() throws Exception {
