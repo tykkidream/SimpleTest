@@ -25,14 +25,19 @@ public class BasketStatement extends Statement {
     public void evaluate() throws Throwable {
         Method method = testMethod.getMethod();
 
+        Object[] params = buildMethodParams(method);
+
+        testMethod.invokeExplosively(target, params);
+    }
+
+    private Object[] buildMethodParams(Method method) {
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
         if (parameterAnnotations == null || parameterAnnotations.length == 0) {
-            return;
+            return null;
         }
 
-        Object[] params = new Object[method.getParameterTypes().length];
-
+        Object[] params =  new Object[method.getParameterTypes().length];
         A : for (int i = 0; i < parameterAnnotations.length; i++){
             Annotation[] annos = parameterAnnotations[i];
             B : for (int j = 0; j < annos.length; j++){
@@ -53,6 +58,6 @@ public class BasketStatement extends Statement {
             }
         }
 
-        testMethod.invokeExplosively(target, params);
+        return params;
     }
 }
