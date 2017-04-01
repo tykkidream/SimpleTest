@@ -21,13 +21,13 @@ public class ArmyantRunnerTest {
     }
 
     @Test
-    @DataFile("/data/data_10.json")
+    @DataFile("/data/data_12.json")
     public void test3(){
         System.out.println("hello world");
     }
 
     @Test
-    @DataFile("/data/data_10.json")
+    @DataFile("/data/data_12.json")
     public void test4(){
         System.out.println("hello world");
     }
