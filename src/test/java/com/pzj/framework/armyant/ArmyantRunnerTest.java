@@ -26,12 +26,22 @@ public class ArmyantRunnerTest {
     @Test
     @DataFile("/data/data_12.json")
     public void test3(){
+        try {
+            Thread.sleep(2000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         System.out.println("hello world");
     }
 
     @Test
     @DataFile("/data/data_12.json")
     public void test4(@DataKey("user") User user, @DataKey("car") Car car){
+        try {
+            Thread.sleep(1000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         System.out.println("hello world");
         System.out.println(user.getNickname());
         System.out.println(car.getName());

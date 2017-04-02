@@ -12,11 +12,11 @@ import org.junit.runners.model.TestClass;
  */
 public abstract class RunnerTask implements Describable {
 
-    private Description description;
+    protected Description description;
 
-    private FrameworkMethod frameworkMethod;
+    protected FrameworkMethod frameworkMethod;
 
-    private TestClass testClass;
+    protected TestClass testClass;
 
     public RunnerTask(TestClass testClass, FrameworkMethod frameworkMethod){
         this.testClass = testClass;

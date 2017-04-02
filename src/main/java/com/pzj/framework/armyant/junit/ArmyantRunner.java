@@ -32,6 +32,8 @@ public class ArmyantRunner extends ParentRunner<RunnerTask> {
 
     private List<RunnerTask> runnerTasks;
 
+    private Description description;
+
     public ArmyantRunner(Class<?> clazz) throws Throwable {
         super(clazz);
     }
@@ -41,29 +43,42 @@ public class ArmyantRunner extends ParentRunner<RunnerTask> {
         List<FrameworkMethod> testWalkers = getTestClass().getAnnotatedMethods(DataFile.class);
 
         List<RunnerTask> runnerTasks = new ArrayList<>(testMethods.size());
+
+
+        Description description = Description.createSuiteDescription(getName(), getRunnerAnnotations());
+
         for (FrameworkMethod method : testMethods) {
             if (testWalkers.contains(method)) {
-                addBatchRunnerTask(runnerTasks, method);
+                Description description1 = addBatchRunnerTask(runnerTasks, method);
+                description.addChild(description1);
             } else {
                 RunnerTask runnerTask = new SimpleRunnerTask(getTestClass(), method);
                 runnerTasks.add(runnerTask);
+                description.addChild(runnerTask.getDescription());
             }
         }
+
+        this.description = description;
+        this.runnerTasks = runnerTasks;
 
         return runnerTasks;
     }
 
-    private void addBatchRunnerTask(List<RunnerTask> runnerTasks, FrameworkMethod method) {
+    private Description addBatchRunnerTask(List<RunnerTask> runnerTasks, FrameworkMethod method) {
         List<Basket> baskets = baskets(method);
 
         if (baskets == null || baskets.isEmpty()) {
-            return;
+            return null;
         }
 
+        Description description = Description.createSuiteDescription(method.getName(), method.getAnnotations());
+        int index = 0;
         for (Basket basket : baskets) {
-            BasketRunnerTask basketRunnerTask = new BasketRunnerTask(getTestClass(), method, basket);
+            BasketRunnerTask basketRunnerTask = new BasketRunnerTask(getTestClass(), method, basket, index++);
             runnerTasks.add(basketRunnerTask);
+            description.addChild(basketRunnerTask.getDescription());
         }
+        return description;
     }
 
     private List<Basket> baskets(FrameworkMethod method) {
@@ -76,6 +91,15 @@ public class ArmyantRunner extends ParentRunner<RunnerTask> {
         }
         return Collections.EMPTY_LIST;
     }
+
+    @Override
+    public Description getDescription() {
+        if (description == null){
+            createWalker();
+        }
+        return description;
+    }
+
 
     @Override
     protected List<RunnerTask> getChildren() {
