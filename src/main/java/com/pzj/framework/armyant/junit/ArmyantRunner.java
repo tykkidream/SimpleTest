@@ -42,13 +42,6 @@ public class ArmyantRunner extends ParentRunner<RunTask> {
     }
 
     @Override
-    public Description getDescription() {
-        Description description = super.getDescription();
-        //return description;
-        return runTask.getDescription();
-    }
-
-    @Override
     protected List<RunTask> getChildren() {
         return runTask.getChildren();
     }

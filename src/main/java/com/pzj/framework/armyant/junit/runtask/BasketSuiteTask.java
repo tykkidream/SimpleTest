@@ -22,8 +22,8 @@ public class BasketSuiteTask extends SimpleRunTask implements RunTask {
     @Override
     public Description getDescription() {
         if (description == null){
-            // description = Description.createTestDescription(testClass.getJavaClass(), frameworkMethod.getName(), frameworkMethod.getAnnotations());
-            description = Description.createSuiteDescription(formatDisplayName(frameworkMethod.getName(), testClass.getName()), frameworkMethod.getAnnotations());
+            String displayName = formatDisplayName(frameworkMethod.getName(), testClass.getName());
+            description = Description.createSuiteDescription(frameworkMethod.getName(),displayName, frameworkMethod.getAnnotations());
             addChildenDescription(description, children);
         }
         return description;
