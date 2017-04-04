@@ -1,321 +1,162 @@
 package com.pzj.framework.armyant.junit;
 
-import com.pzj.framework.armyant.load.Basket;
-import org.junit.*;
+import com.pzj.framework.armyant.junit.runtask.BasketSuiteTask;
+import com.pzj.framework.armyant.junit.runtask.SimpleSuiteTask;
 import org.junit.internal.runners.model.ReflectiveCallable;
-import org.junit.internal.runners.statements.*;
-import org.junit.rules.MethodRule;
-import org.junit.rules.RunRules;
-import org.junit.rules.TestRule;
+import org.junit.internal.runners.statements.Fail;
 import org.junit.runner.Description;
+import org.junit.runner.manipulation.Filter;
+import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.ParentRunner;
-import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.lang.reflect.Field;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.internal.runners.rules.RuleMemberValidator.RULE_METHOD_VALIDATOR;
-import static org.junit.internal.runners.rules.RuleMemberValidator.RULE_VALIDATOR;
 
 /**
  * Created by Administrator on 2017-1-4.
  */
-public class ArmyantRunner extends ParentRunner<RunnerTask> {
+public class ArmyantRunner extends ParentRunner<RunTask> {
     private static Logger logger = LoggerFactory.getLogger(ArmyantRunner.class);
 
-    private List<RunnerTask> runnerTasks;
-
-    private Description description;
+    private SimpleSuiteTask runTask;
 
     public ArmyantRunner(Class<?> clazz) throws Throwable {
         super(clazz);
+        init();
+        validate();
     }
 
-    private List<RunnerTask> createWalker() {
-        List<FrameworkMethod> testMethods = getTestClass().getAnnotatedMethods(Test.class);
-        List<FrameworkMethod> testWalkers = getTestClass().getAnnotatedMethods(DataFile.class);
-
-        List<RunnerTask> runnerTasks = new ArrayList<>(testMethods.size());
-
-
-        Description description = Description.createSuiteDescription(getName(), getRunnerAnnotations());
-
-        for (FrameworkMethod method : testMethods) {
-            if (testWalkers.contains(method)) {
-                Description description1 = addBatchRunnerTask(runnerTasks, method);
-                description.addChild(description1);
-            } else {
-                RunnerTask runnerTask = new SimpleRunnerTask(getTestClass(), method);
-                runnerTasks.add(runnerTask);
-                description.addChild(runnerTask.getDescription());
-            }
-        }
-
-        this.description = description;
-        this.runnerTasks = runnerTasks;
-
-        return runnerTasks;
+    private void init() {
+        SimpleSuiteTask runTask = RunTaskBuilder.build(getTestClass());
+        this.runTask = runTask;
     }
 
-    private Description addBatchRunnerTask(List<RunnerTask> runnerTasks, FrameworkMethod method) {
-        List<Basket> baskets = baskets(method);
-
-        if (baskets == null || baskets.isEmpty()) {
-            return null;
-        }
-
-        Description description = Description.createSuiteDescription(method.getName(), method.getAnnotations());
-        int index = 0;
-        for (Basket basket : baskets) {
-            BasketRunnerTask basketRunnerTask = new BasketRunnerTask(getTestClass(), method, basket, index++);
-            runnerTasks.add(basketRunnerTask);
-            description.addChild(basketRunnerTask.getDescription());
-        }
-        return description;
-    }
-
-    private List<Basket> baskets(FrameworkMethod method) {
-        DataFile dataFile = method.getAnnotation(DataFile.class);
-        String filePath = dataFile.value();
-        ArmyantJunitBasket basket = ArmyantJunitBasket.build(filePath);
-        if (basket != null){
-            List<Basket> datas = basket.getDatas();
-            return datas;
-        }
-        return Collections.EMPTY_LIST;
+    private void validate() throws InitializationError {
+        ArmyantRunnerValidate validate = new ArmyantRunnerValidate(this);
+        validate.validate();
     }
 
     @Override
     public Description getDescription() {
-        if (description == null){
-            createWalker();
-        }
-        return description;
-    }
-
-
-    @Override
-    protected List<RunnerTask> getChildren() {
-        if (runnerTasks == null){
-            runnerTasks = Collections.unmodifiableList(createWalker());
-        }
-        return runnerTasks;
+        Description description = super.getDescription();
+        //return description;
+        return runTask.getDescription();
     }
 
     @Override
-    protected Description describeChild(RunnerTask child) {
+    protected List<RunTask> getChildren() {
+        return runTask.getChildren();
+    }
+
+    @Override
+    protected Description describeChild(RunTask child) {
         return child.getDescription();
     }
 
     @Override
-    protected void runChild(RunnerTask runnerTask, RunNotifier notifier) {
-        FrameworkMethod frameworkMethod = runnerTask.getFrameworkMethod();
-        Description description = runnerTask.getDescription();
-        if (isIgnored(frameworkMethod)) {
+    protected void runChild(RunTask runTask, RunNotifier notifier) {
+        if (runTask.isIgnored()){
             // 被忽略的测试方法
-            notifier.fireTestIgnored(description);
+            notifier.fireTestIgnored(runTask.getDescription());
+        } else if (runTask instanceof BasketSuiteTask){
+            // 正常可被测试的方法：执行多个RunTask
+            runSuite((BasketSuiteTask)runTask, notifier);
         } else {
-            // 正常可被测试的方法
-            runLeaf(methodBlock(runnerTask), description, notifier);
+            // 正常可被测试的方法：执行单个RunTask
+            Statement statement = methodBlock(runTask);
+            runLeaf(statement, runTask.getDescription(), notifier);
         }
     }
 
-    protected boolean isIgnored(FrameworkMethod child) {
-        return child.getAnnotation(Ignore.class) != null;
-    }
-
-    @Override
-    protected void collectInitializationErrors(List<Throwable> errors) {
-        super.collectInitializationErrors(errors);
-
-        validateNoNonStaticInnerClass(errors);
-        validateConstructor(errors);
-        validateInstanceMethods(errors);
-        validateFields(errors);
-        validateMethods(errors);
-    }
-
-    protected void validateNoNonStaticInnerClass(List<Throwable> errors) {
-        if (getTestClass().isANonStaticInnerClass()) {
-            String gripe = "The inner class " + getTestClass().getName() + " is not static.";
-            errors.add(new Exception(gripe));
+    private void runSuite(BasketSuiteTask runTask, RunNotifier notifier){
+        List<RunTask> children = runTask.getChildren();
+        for (RunTask childTask : children){
+            runChild(childTask, notifier);
         }
     }
 
-    protected void validateConstructor(List<Throwable> errors) {
-        validateOnlyOneConstructor(errors);
-        validateZeroArgConstructor(errors);
-    }
+    private Statement methodBlock(RunTask runTask){
+        Object target;
+        try {
+            target = new ReflectiveCallable() {
+                @Override
+                protected Object runReflectiveCall() throws Throwable {
+                    return createTest();
+                }
+            }.run();
 
-    protected void validateOnlyOneConstructor(List<Throwable> errors) {
-        if (!hasOneConstructor()) {
-            String gripe = "Test class should have exactly one public constructor";
-            errors.add(new Exception(gripe));
+        } catch (Throwable e) {
+            return new Fail(e);
         }
-    }
-
-    protected void validateZeroArgConstructor(List<Throwable> errors) {
-        if (!getTestClass().isANonStaticInnerClass()
-                && hasOneConstructor()
-                && (getTestClass().getOnlyConstructor().getParameterTypes().length != 0)) {
-            String gripe = "Test class should have exactly one public zero-argument constructor";
-            errors.add(new Exception(gripe));
-        }
-    }
-
-    private boolean hasOneConstructor() {
-        return getTestClass().getJavaClass().getConstructors().length == 1;
-    }
-
-    @Deprecated
-    protected void validateInstanceMethods(List<Throwable> errors) {
-        validatePublicVoidNoArgMethods(After.class, false, errors);
-        validatePublicVoidNoArgMethods(Before.class, false, errors);
-        validateTestMethods(errors);
-
-        if (getChildren().size() == 0) {
-            errors.add(new Exception("No runnable methods"));
-        }
-    }
-
-    protected void validateFields(List<Throwable> errors) {
-        RULE_VALIDATOR.validate(getTestClass(), errors);
-    }
-
-    private void validateMethods(List<Throwable> errors) {
-        RULE_METHOD_VALIDATOR.validate(getTestClass(), errors);
-    }
-
-    protected void validateTestMethods(List<Throwable> errors) {
-        validatePublicVoidNoArgMethods(Test.class, false, errors);
-    }
-
-    protected void validatePublicVoidNoArgMethods(Class<? extends Annotation> annotation,
-                                                  boolean isStatic, List<Throwable> errors) {
-        List<FrameworkMethod> methods = getTestClass().getAnnotatedMethods(annotation);
-
-        // 迭代每个方法
-        for (FrameworkMethod eachTestMethod : methods) {
-            // 检验方法是公共的、无返回值的
-            eachTestMethod.validatePublicVoid(isStatic, errors);
-        }
+        return runTask.createStatement(target);
     }
 
     protected Object createTest() throws Exception {
         return getTestClass().getOnlyConstructor().newInstance();
     }
 
-    protected Statement methodBlock(RunnerTask task) {
-        Object test;
-        try {
-            test = new ReflectiveCallable() {
-                @Override
-                protected Object runReflectiveCall() throws Throwable {
-                    return createTest();
+    public void filter(Filter filter) throws NoTestsRemainException {
+
+        final Description desiredDescription = filterDesiredDescription(filter);
+        Filter myFilter = new Filter(){
+            @Override
+            public boolean shouldRun(Description description) {
+                boolean equals = desiredDescription.equals(description);
+                if (equals){
+                    return equals;
                 }
-            }.run();
-        } catch (Throwable e) {
-            return new Fail(e);
-        }
 
-        Statement statement = methodInvoker(task, test);
-        statement = possiblyExpectingExceptions(task, test, statement);
-        statement = withPotentialTimeout(task, test, statement);
-        statement = withBefores(task, test, statement);
-        statement = withAfters(task, test, statement);
-        statement = withRules(task, test, statement);
-        return statement;
-    }
+                if (!description.isTest()) {
+                    for (Description each : description.getChildren()) {
+                        if (shouldRun(each)) {
+                            return true;
+                        }
+                    }
+                }
 
-    protected Statement methodInvoker(RunnerTask task, Object test) {
-        return task.createStatement(test);
-    }
-
-    protected Statement possiblyExpectingExceptions(RunnerTask task, Object test, Statement next) {
-        Test annotation = task.getFrameworkMethod().getAnnotation(Test.class);
-        return expectsException(annotation) ? new ExpectException(next, getExpectedException(annotation)) : next;
-    }
-
-    @Deprecated
-    protected Statement withPotentialTimeout(RunnerTask task, Object test, Statement next) {
-        long timeout = getTimeout(task.getFrameworkMethod().getAnnotation(Test.class));
-        if (timeout <= 0) {
-            return next;
-        }
-        return FailOnTimeout.builder().withTimeout(timeout, TimeUnit.MILLISECONDS).build(next);
-    }
-
-    protected Statement withBefores(RunnerTask task, Object target, Statement statement) {
-        List<FrameworkMethod> befores = getTestClass().getAnnotatedMethods(Before.class);
-        return befores.isEmpty() ? statement : new RunBefores(statement, befores, target);
-    }
-
-    protected Statement withAfters(RunnerTask task, Object target, Statement statement) {
-        List<FrameworkMethod> afters = getTestClass().getAnnotatedMethods(After.class);
-        return afters.isEmpty() ? statement : new RunAfters(statement, afters, target);
-    }
-
-    private Statement withRules(RunnerTask task, Object target, Statement statement) {
-        List<TestRule> testRules = getTestRules(target);
-        Statement result = statement;
-        result = withMethodRules(task, testRules, target, result);
-        result = withTestRules(task, testRules, result);
-        return result;
-    }
-
-    private Statement withMethodRules(RunnerTask task, List<TestRule> testRules, Object target, Statement result) {
-        for (org.junit.rules.MethodRule each : getMethodRules(target)) {
-            if (!testRules.contains(each)) {
-                result = each.apply(result, task.getFrameworkMethod(), target);
+                return false;
             }
+
+            @Override
+            public String describe() {
+                return String.format("Method %s", desiredDescription.getDisplayName());
+            }
+        };
+
+        super.filter(myFilter);
+    }
+
+    private Description filterDesiredDescription(Filter filter){
+        try {
+            Field[] declaredFields = filter.getClass().getDeclaredFields();
+            if (declaredFields == null || declaredFields.length == 0){
+                return null;
+            }
+
+            for (int i =0; i < declaredFields.length; i++){
+                Field field = declaredFields[i];
+                field.setAccessible(true);
+
+                if (Filter.class.isAssignableFrom(field.getType())){
+                    Filter value = (Filter)field.get(filter);
+                    Description description = filterDesiredDescription(value);
+                    if (description != null){
+                        return description;
+                    }
+                }
+                if (Description.class.isAssignableFrom(field.getType())){
+                    Description value = (Description)field.get(filter);
+                    return value;
+                }
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
-        return result;
-    }
-
-    private List<org.junit.rules.MethodRule> getMethodRules(Object target) {
-        return rules(target);
-    }
-
-    protected List<MethodRule> rules(Object target) {
-        List<MethodRule> rules = getTestClass().getAnnotatedMethodValues(target, Rule.class, MethodRule.class);
-        rules.addAll(getTestClass().getAnnotatedFieldValues(target, Rule.class, MethodRule.class));
-        return rules;
-    }
-
-    private Statement withTestRules(RunnerTask task, List<TestRule> testRules, Statement statement) {
-        return testRules.isEmpty() ? statement : new RunRules(statement, testRules, describeChild(task));
-    }
-
-    protected List<TestRule> getTestRules(Object target) {
-        List<TestRule> result = getTestClass().getAnnotatedMethodValues(target, Rule.class, TestRule.class);
-
-        result.addAll(getTestClass().getAnnotatedFieldValues(target, Rule.class, TestRule.class));
-        return result;
-    }
-
-    private Class<? extends Throwable> getExpectedException(Test annotation) {
-        if (annotation == null || annotation.expected() == Test.None.class) {
-            return null;
-        } else {
-            return annotation.expected();
-        }
-    }
-
-    private boolean expectsException(Test annotation) {
-        return getExpectedException(annotation) != null;
-    }
-
-    private long getTimeout(Test annotation) {
-        if (annotation == null) {
-            return 0;
-        }
-        return annotation.timeout();
+        return null;
     }
 }

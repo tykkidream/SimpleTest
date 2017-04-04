@@ -1,10 +1,8 @@
-package com.pzj.framework.armyant.junit;
+package com.pzj.framework.armyant.junit.load;
 
 import com.pzj.framework.armyant.load.Basket;
 import com.pzj.framework.armyant.load.fastjson.FastjsonLoaderBuild;
 import com.pzj.framework.armyant.load.fastjson.FastjsonResource;
-import com.pzj.framework.armyant.load.fastjson.parsers.BasketParser;
-import com.pzj.framework.armyant.load.fastjson.parsers.MultiParser;
 import com.pzj.framework.armyant.load.fastjson.parsers.SchemaParser;
 
 import java.util.Arrays;
